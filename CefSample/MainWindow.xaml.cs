@@ -1,4 +1,5 @@
-﻿using CefSharp.Wpf;
+﻿using CefSharp;
+using CefSharp.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +24,23 @@ namespace CefSample
     {
         public MainWindow()
         {
+            CefHelper.Init();
             var vm = new ViewModel();
             Initialized += vm.Init;
             DataContext = vm;
             InitializeComponent();
+        }
+    }
+
+    static class CefHelper
+    {
+        public static void Init()
+        {
+            var cefSettings = new CefSettings
+            {
+                UserAgent = "CefSample",
+            };
+            Cef.Initialize(cefSettings);
         }
     }
 
@@ -41,7 +55,8 @@ namespace CefSample
         public async void Init(object sender, EventArgs e)
         {
             await WaitBrowserInit();
-            Browser.Load("https://google.com");
+            // IsBrowserInitialized == trueでないとLoadが失敗する
+            Browser.Load("http://www.ugtop.com/spill.shtml");
         }
 
         private async Task WaitBrowserInit()
