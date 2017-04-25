@@ -38,7 +38,6 @@ namespace CefSample
         {
             var cefSettings = new CefSettings
             {
-                UserAgent = "CefSample",
             };
             Cef.Initialize(cefSettings);
         }
@@ -50,13 +49,21 @@ namespace CefSample
         public ViewModel()
         {
             Browser = new ChromiumWebBrowser();
+            Browser.FrameLoadStart += (sender, e) =>
+            {
+                var uri = new Uri(e.Url);
+                if (uri.Host == "www.google.co.jp")
+                {
+                    MessageBox.Show("www.google.co.jpのページに遷移します");
+                }
+            };
         }
 
         public async void Init(object sender, EventArgs e)
         {
             await WaitBrowserInit();
             // IsBrowserInitialized == trueでないとLoadが失敗する
-            Browser.Load("http://www.ugtop.com/spill.shtml");
+            Browser.Load("https://www.google.co.jp");
         }
 
         private async Task WaitBrowserInit()
