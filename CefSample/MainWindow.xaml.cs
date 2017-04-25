@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CefSharp.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,37 @@ namespace CefSample
     {
         public MainWindow()
         {
+            var vm = new ViewModel();
+            Initialized += vm.Init;
+            DataContext = vm;
             InitializeComponent();
+        }
+    }
+
+    class ViewModel
+    {
+        public ChromiumWebBrowser Browser { get; private set; }
+        public ViewModel()
+        {
+            Browser = new ChromiumWebBrowser();
+        }
+
+        public async void Init(object sender, EventArgs e)
+        {
+            await WaitBrowserInit();
+            Browser.Load("https://google.com");
+        }
+
+        private async Task WaitBrowserInit()
+        {
+            var taskSource = new TaskCompletionSource<bool>();
+            if (Browser.IsBrowserInitialized) return;
+            Browser.IsBrowserInitializedChanged += (sender, e) =>
+            {
+                if (taskSource.Task.IsCompleted) return;
+                taskSource.SetResult(true);
+            };
+            await taskSource.Task;
         }
     }
 }
